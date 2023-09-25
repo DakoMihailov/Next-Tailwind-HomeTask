@@ -1,79 +1,75 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable react/jsx-no-useless-fragment */
-/* eslint-disable sonarjs/cognitive-complexity */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable sonarjs/no-duplicate-string */
-/* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable import/no-extraneous-dependencies */
 import React, { useState } from 'react'
 import { NextPage } from 'next'
+import Button from '@/components/Button'
+import { useForm } from 'react-hook-form'
+import Editor from 'react-simple-code-editor'
+import 'prismjs/components/prism-clike'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/themes/prism.css'
+import { languages } from 'prismjs/components/prism-core'
+import { hightlightWithLineNumbers, validateInput } from '@/utils'
 
-import AddItemForm from '@/components/AddItem/AddItem'
-import AddLocationButton from '@/components/AddLocationButton/AddLocationButton'
-import EditItemForm from '@/components/EditItemForm/EditItemForm'
-import Header from '@/components/Header/Header'
-import InfoPanel from '@/components/InfoPanel/InfoPanel'
-import { useAppSelector } from '@/hooks/stores'
-import type { AddInfoType, EditInfoType } from '@/types'
+interface FormType {
+  input:string
+}
 
-const Home: NextPage = () => {
-  const infos = useAppSelector((state) => state.info.info)
-  const [item, setItem] = useState(false)
-  const [formType, setFormType] = useState(false)
-  const [toast, setToast] = useState(false)
-  const [selectedData, setSelectedData] = useState<EditInfoType | null>(null)
-  const onAddItem = () => {
-    setItem(!item)
-    setFormType(true)
+const Home : NextPage = () => {
+  const [text, setText] = useState<string>('')
+  const [errors, setErrors] = useState<string[]>([])
+  const [validateResult, setValidateResult] = useState(true)
+  const [disabled, setDisabled] = useState(false)
+
+  const { handleSubmit} = useForm<FormType>({
+    mode: 'all',
+  })
+    
+  const onSubmit = () => {
+    const result = validateInput(text)
+    setErrors(result.result)
+    setValidateResult(result.validateResult)
+    setDisabled(result.disabled)
   }
-  const onEditItem = () => {
-    setItem(!item)
-    setFormType(false)
-  }
-  const setSelected = (data: AddInfoType, id: number) => {
-    setSelectedData({ data, id })
-  }
-  const onSetToast = () => {
-    setToast(!toast)
-  }
-  return (
-    <>
-      {toast && <Header setToastStatus={onSetToast} />}
-      <div className='flex min-h-screen justify-center w-full bg-primary'>
-        <div>
-          <div className='flex justify-center not-italic font-light text-primary text-xl mt-40 '>Offices</div>
-          {!item ? (
-            <AddLocationButton onSetItem={onAddItem} />
-          ) : formType ? (
-            <AddItemForm onSetItem={onAddItem} setToastStatus={onSetToast} />
-          ) : (
-            <EditItemForm onSetItem={onAddItem} selectedData={selectedData} setToastStatus={onSetToast} />
-          )}
-          {infos.length > 0 &&
-            infos.map((element, id) => (
-              <InfoPanel
-                data={element}
-                id={id}
-                onSetItemForEdit={() => {
-                  onEditItem()
-                  setSelected(element, id)
-                }}
-                onSetItemForRemove={() => {
-                  setItem(false)
-                  onSetToast()
-                }}
-              />
-            ))}
-          <div className='flex justify-center mt-primary text-success font-normal not-italic text-4xl'>
-            This project is for test purpose only.
-          </div>
-          <div className='flex justify-center mt-2 text-primary font-normal not-italic text-5xl'>
-            WWW.DOGANDPONYSTUDIOS.COM
-          </div>
+  
+  return(
+    <div className='flex flex-col items-center justify-center w-full h-screen'>
+      <div className='flex flex-col w-1/2'>
+        <div className='flex justify-between'>
+          <span className='text-base font-medium text-white'>Addresses with Amounts</span>
+          <span className='text-white hover:cursor-pointer'>Upload File</span>
         </div>
-      </div>
-    </>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className='w-full mt-6 max-h-[300px] overflow-auto'>
+            <Editor
+              value={text}
+              onValueChange={code => setText(code)}
+              highlight={code => hightlightWithLineNumbers(code, languages.js)}
+              padding={10}
+              textareaId='codeArea'
+              className='editor'
+            />
+          </div>       
+          <div className='flex flex-row justify-between mt-6'>
+            <span className='text-base font-medium text-white'>Separated by &apos;,&apos; or &apos; &apos; or &apos;=&apos;</span>
+            <span className='text-[#5a5b67] hover:underline hover:cursor-pointer'>Show Examples</span>
+          </div>
+          {!validateResult && (
+            <div className='flex flex-col p-4 rounded-lg border-2 border-[#682d2d] gap-2 mt-6'>
+              {
+                errors?.map(error => {
+                  return (
+                    <span className='text-[#cf372e]'>{error}</span>
+                  )
+                })
+              }              
+            </div>
+          )
+          }          
+          <div className='py-6'>
+            <Button text='Next' variant='gradient' className='w-full' isLoading={disabled}/>
+          </div>
+        </form>
+      </div>      
+    </div>
   )
 }
 

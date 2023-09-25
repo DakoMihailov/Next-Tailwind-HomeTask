@@ -22,6 +22,11 @@
     "rules": {
         "react/require-default-props": "off",
         "import/prefer-default-export": "off",
+        "react/react-in-jsx-scope": "off",
+        "no-lonely-if": "off",
+        "arrow-body-style": "off",
+        "import/no-extraneous-dependencies": "off",
+        "react/jsx-props-no-spreading": "off",
         "react/prop-types": "off",
         "no-multi-assign": "off",
         "import/imports-first": [
@@ -69,6 +74,7 @@
         ],
         "use-isnan": "error",
         "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-unnecessary-condition": "off",
         "unused-imports/no-unused-imports": "warn",
         "unused-imports/no-unused-vars": [
             "warn",
@@ -84,12 +90,6 @@
         "@typescript-eslint/no-misused-new": "error",
         "@typescript-eslint/no-use-before-define": "error",
         "@typescript-eslint/restrict-plus-operands": "error",
-        "@typescript-eslint/no-unnecessary-condition": [
-            "error",
-            {
-                "allowConstantLoopConditions": true
-            }
-        ]
     },
     "settings": {
         "import/parsers": {

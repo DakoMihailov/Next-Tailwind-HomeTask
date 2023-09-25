@@ -2,11 +2,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { configureStore } from '@reduxjs/toolkit'
 
-import infoSlice from './infoSlice'
-
 export const store = configureStore({
   reducer: {
-    info: infoSlice,
   },
 })
 
